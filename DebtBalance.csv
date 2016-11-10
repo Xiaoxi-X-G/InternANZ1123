@@ -1,0 +1,7 @@
+"ï..companyId","componentId","startDate","capitalStructureDescription","capitalStructureSubTypeName","filingDate","periodEndDate","periodType","outstandingBalance","couponRate","maturityYearHigh","maturityMonthHigh","maturityDayHigh","seniority","secured","convertiblity","issuedCurrency","filingCurrency","reportingAge"
+"515275",901864850,"NULL","4.75% Notes Payable","Bonds and Notes","2008-05-12 00:00:00.000","2008-03-31 00:00:00.000","quarter",2.5e+08,"4.750",2010,"NULL","NULL","Senior","NO","Not Convertible","USD","USD",1
+"515275",901864850,"NULL","4.75% Notes Payable","Bonds and Notes","2009-05-08 00:00:00.000","2009-03-31 00:00:00.000","quarter",2.5e+08,"4.750",2010,"NULL","NULL","Senior","NO","Not Convertible","USD","USD",2
+"515275",901864850,"NULL","4.75% Notes Payable","Bonds and Notes","2009-11-09 00:00:00.000","2009-09-30 00:00:00.000","quarter",2.5e+08,"4.750",2010,"NULL","NULL","Senior","NO","Not Convertible","USD","USD",3
+"128209",901866604,"NULL","3% Five-Year Notes","Bonds and Notes","2003-07-23 00:00:00.000","2003-06-30 00:00:00.000","quarter",1e+08,"3.000",2008,"NULL","NULL","Senior",NA,"Not Convertible","USD","USD",1
+"128209",901866604,"NULL","3% Five-Year Notes","Bonds and Notes","2003-10-22 00:00:00.000","2003-09-30 00:00:00.000","quarter",1e+08,"3.000",2008,"NULL","NULL","Senior",NA,"Not Convertible","USD","USD",2
+"175265",901866621,"NULL","7.875% Debentures Due 2026","Bonds and Notes","2010-04-28 00:00:00.000","2010-03-31 00:00:00.000","quarter",7.2e+07,"7.875",2026,"NULL","NULL","Senior",NA,"Not Convertible","USD","USD",1
