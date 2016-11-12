@@ -33,7 +33,7 @@ DebtIssueCompany <-c()
 m <-0
 for (i in unique(DebtBalance.2use$ComponentID)){
   m <- m + 1
-  print(m/1252005)
+  print(1252005-m)
   Ind <- which(DebtBalance.2use$ComponentID == i) # Find Index
   OutstandingBalance.all <- DebtBalance.2use$OutstandingBalance[Ind]
   if ((tail(OutstandingBalance.all, n = 1) - OutstandingBalance.all[1]) > 0){
@@ -43,6 +43,8 @@ for (i in unique(DebtBalance.2use$ComponentID)){
 }
 
 DebtIssueCompany <- unique(DebtIssueCompany)
+
+write.csv(DebtIssueCompany, "DebtIssueCompany.cvs", row.names = F)
   
   
   
