@@ -26,3 +26,26 @@ DebtBalance.2use <- DebtBalance.2use.temp[order(DebtBalance.2use.temp$CompanyID,
 
 DebtBalance.2use <- DebtBalance.2use[-1,]
 
+head(DebtBalance.2use, n =40)
+
+## Find company with debt issue
+DebtIssueCompany <-c()
+m <-0
+for (i in unique(DebtBalance.2use$ComponentID)){
+  m <- m + 1
+  print(m/1252005)
+  Ind <- which(DebtBalance.2use$ComponentID == i) # Find Index
+  OutstandingBalance.all <- DebtBalance.2use$OutstandingBalance[Ind]
+  if ((tail(OutstandingBalance.all, n = 1) - OutstandingBalance.all[1]) > 0){
+    temp <- DebtBalance.2use$CompanyID[Ind[1]] # Find Compnay ID
+    DebtIssueCompany <- c(DebtIssueCompany, temp) 
+  }
+}
+
+DebtIssueCompany <- unique(DebtIssueCompany)
+  
+  
+  
+  
+  
+  
