@@ -30,5 +30,5 @@ DebtBalance2.order <- DebtBalance2[order(DebtBalance2$companyId,
                                          DebtBalance2$filingDate),]
 
 
-#### Find market enty dates ###
+#### Find companies (issued debts)  with new market  ###
 
