@@ -12,4 +12,4 @@ IncomeStatement<- read.delim(file = paste(DataPath, "/income_statement.tsv", sep
                           header = T,
                           stringsAsFactors = F,
                           quote = "",
-                          na.strings = c("","NA", "NULL"))
+                          na.strings = c("","NA", "NULL")) 
