@@ -32,22 +32,15 @@ CompanyIDComm<- read.csv(file = paste(DataPath, "/CompanyIDComm.csv", sep=""),
                          stringsAsFactors = F)
 
 
-length(unique(DebtBalance.raw$ï..companyId))
-length(unique(DebtIssuance.raw$ï..companyId))
-
-length(intersect(unique(DebtBalance.raw$ï..companyId), unique(DebtIssuance.raw$ï..companyId)))
-
-length(intersect(unique(CompanyIDComm$DebtIssueCompany), unique(DebtIssuance.raw$ï..companyId)))
 
 
-
-
-### filter debt balance
+### filter debt balance: using companyIDs shared by all files
 library(RODBC)
 odbcDataSources()
 conn<-odbcConnect(dsn="localdb") 
 
-DebtBalance2 <- sqlQuery(conn, "select DB.companyId,   convert(char(10),DB.filingDate, 126) AS filingDate, 
+DebtBalance2 <- 
+  sqlQuery(conn, "select DB.companyId,   convert(char(10),DB.filingDate, 126) AS filingDate, 
                          convert(char(10), DB.periodEndDate,  126) AS PeriodEndDate, 
                          DB.issuedCurrency AS IssuedCurrency from interanz1123.dbo.debt_balance DB
                          where DB.companyId in 
@@ -58,8 +51,8 @@ DebtBalance2 <- sqlQuery(conn, "select DB.companyId,   convert(char(10),DB.filin
                          )
                          order by DB.companyId, DB.issuedCurrency, DB.periodEndDate
                          ",
-                         stringsAsFactors = FALSE, as.is = TRUE, 
-                         na.string = c("NULL", "NA", "", "NULL      "))
+           stringsAsFactors = FALSE, as.is = TRUE, 
+           na.string = c("NULL", "NA", "", "NULL      "))
 
 
 DebtBalance2$companyId <- as.integer(DebtBalance2$companyId)
