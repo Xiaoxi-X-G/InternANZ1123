@@ -115,7 +115,6 @@ for (i in unique(DebtBalance2.order$companyId)){
 ######Step3 ######
 #### Rank the companies for each currency: A score in [0,1] is given for a company for each currency
 
-
 #3.1: Order all companyID by Currencies, and by Market Entry Date
 CompanyScore.temp <- MarketEntryData[order(MarketEntryData$IssuedCurrency,
                                            MarketEntryData$MarketEntryDate,
@@ -155,4 +154,4 @@ df.CompanyScore$TotalScore <- rowSums(df.CompanyScore[,-1])
 
 Finial.CompanyScore <- df.CompanyScore[order(df.CompanyScore$TotalScore, decreasing = T),]
 
-plot(sort(Finial.CompanyScore$TotalScore, decreasing =T))
+plot(sort(Finial.CompanyScore$AUD, decreasing =T))
