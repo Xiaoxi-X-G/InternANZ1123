@@ -47,7 +47,7 @@ for (i in unique(CompanyScore.temp$IssuedCurrency)){
   Score <- tapply(temp11$Rank, INDEX = temp11$companyId, FUN = sum) 
   RowInd.score <- match(names(Score), CompanyScore[,1]) # Find the companyID index for the given currency
   
-  CompanyScore[RowInd.score, i] <- unname(Score) #
+  CompanyScore[RowInd.score, i] <- unname(Score) # 
 }
 
 
