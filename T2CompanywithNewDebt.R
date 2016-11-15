@@ -22,3 +22,19 @@ DebtIssuance.raw <- read.delim(file = paste(DataPath, "/debt_issuance.rpt", sep 
                               stringsAsFactors = F,
                               quote = "",
                               na.strings = c("","NA", "NULL"))
+# 
+# write.csv(DebtIssuance.raw[, c(1)], paste(DataPath, "/DebtIssuance_Short.csv", sep = ""),
+#           row.names = F, quote =  F)
+
+
+CompanyIDComm<- read.csv(file = paste(DataPath, "/CompanyIDComm.csv", sep=""), 
+                         header = T,
+                         stringsAsFactors = F)
+
+
+length(unique(DebtBalance.raw$ï..companyId))
+length(unique(DebtIssuance.raw$ï..companyId))
+
+length(intersect(unique(DebtBalance.raw$ï..companyId), unique(DebtIssuance.raw$ï..companyId)))
+
+length(intersect(unique(CompanyIDComm$DebtIssueCompany), unique(DebtIssuance.raw$ï..companyId)))
