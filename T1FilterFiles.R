@@ -33,11 +33,11 @@ CompanyID.Common <- sqlQuery(conn, "select distinct CF.capiq_company_id AS DebtI
 ####2. Import "CompanyIDComm" to SQL #####
 
 ####3. Filter all other fills, CompanyIDComm & Balance_Issuance  #####
-Cashflow.2use <- sqlQuery(conn, "select * from cashflow CF
+Cashflow.2use <- sqlQuery(conn, "select * from interanz1123.dbo.cashflow CF
                           where CF.capiq_company_id in
                           (
-                          select distinct CIC.CompanyID from CompanyIDComm CIC
-                          inner join  DebtIssuance_Short DIS
+                          select distinct CIC.CompanyID from interanz1123.dbo.CompanyIDComm CIC
+                          inner join  interanz1123.dbo.DebtIssuance_Short DIS
                           on CIC.CompanyID = DIS.CompanyID
                           )",
                           stringsAsFactors = FALSE, as.is = TRUE, 
@@ -48,10 +48,10 @@ Cashflow.2use <- sqlQuery(conn, "select * from cashflow CF
 
 ###################
 
-IncomeStatement.2use <- sqlQuery(conn, "select * from income_statement CF  where CF.capiq_company_id in
+IncomeStatement.2use <- sqlQuery(conn, "select * from interanz1123.dbo.income_statement CF  where CF.capiq_company_id in
                                  (
-                                 select distinct CIC.CompanyID from CompanyIDComm CIC
-                                 inner join  DebtIssuance_Short DIS
+                                 select distinct CIC.CompanyID from interanz1123.dbo.CompanyIDComm CIC
+                                 inner join  interanz1123.dbo.DebtIssuance_Short DIS
                                  on CIC.CompanyID = DIS.CompanyID
                                  )",
                           stringsAsFactors = FALSE, as.is = TRUE, 
@@ -62,10 +62,10 @@ IncomeStatement.2use <- sqlQuery(conn, "select * from income_statement CF  where
 
 ######################
 
-BalanceSheet.2use <- sqlQuery(conn, "select * from balance_sheet CF  where CF.capiq_company_id in
+BalanceSheet.2use <- sqlQuery(conn, "select * from interanz1123.dbo.balance_sheet CF  where CF.capiq_company_id in
                               (
-                              select distinct CIC.CompanyID from CompanyIDComm CIC
-                              inner join  DebtIssuance_Short DIS
+                              select distinct CIC.CompanyID from interanz1123.dbo.CompanyIDComm CIC
+                              inner join  interanz1123.dbo.DebtIssuance_Short DIS
                               on CIC.CompanyID = DIS.CompanyID
                               )",
                           stringsAsFactors = FALSE, as.is = TRUE, 
@@ -74,3 +74,29 @@ BalanceSheet.2use <- sqlQuery(conn, "select * from balance_sheet CF  where CF.ca
 # write.csv(BalanceSheet.2use, paste(DataPath, "/BalanceSheet_Filtered2.csv", sep = ""),
 #           row.names = F, quote =  F)
 
+
+
+#### Filter out "NULL" columns ####
+###
+Col2Keep <- function(InputData, Percentage){
+  NACols <- apply(InputData, MARGIN = 2, function(x, y=nrow(InputData)){ 
+    length(which(is.na(x)))/y}
+  )
+  
+  KeepInd <- match(names(NACols[which(NACols < Percentage)]), names(InputData))
+  return(InputData[,KeepInd])
+}
+
+# Delete the column, if more than 30% of rows are NULL
+
+###
+Cashflow_Filter3 <- Col2Keep(Cashflow.2use, Percentage=0.3)
+IncomeStatement_Filter3 <- Col2Keep(IncomeStatement.2use, Percentage=0.3)
+BalanceSheet_Filter3 <- Col2Keep(BalanceSheet.2use, Percentage=0.3)
+
+# write.csv(Cashflow_Filter3, paste(DataPath, "/Cashflow_Filter3.csv", sep = ""),
+#           row.names = F, quote =  F)
+# write.csv(IncomeStatement_Filter3, paste(DataPath, "/IncomeStatement_Filter3.csv", sep = ""),
+#           row.names = F, quote =  F)
+# write.csv(BalanceSheet_Filter3, paste(DataPath, "/BalanceSheet_Filtered3.csv", sep = ""),
+#           row.names = F, quote =  F)
