@@ -34,10 +34,10 @@ CompanyID.Common <- sqlQuery(conn, "select distinct CF.capiq_company_id AS DebtI
 
 ####3. Filter all other fills, CompanyIDComm & Balance_Issuance  #####
 Cashflow.2use <- sqlQuery(conn, "select * from cashflow CF
- where CF.capiq_company_id in
+                          where CF.capiq_company_id in
                           (
-                          	select distinct CIC.CompanyID from CompanyIDComm CIC
-	inner join  DebtIssuance_Short DIS
+                          select distinct CIC.CompanyID from CompanyIDComm CIC
+                          inner join  DebtIssuance_Short DIS
                           on CIC.CompanyID = DIS.CompanyID
                           )",
                           stringsAsFactors = FALSE, as.is = TRUE, 
@@ -49,11 +49,11 @@ Cashflow.2use <- sqlQuery(conn, "select * from cashflow CF
 ###################
 
 IncomeStatement.2use <- sqlQuery(conn, "select * from income_statement CF  where CF.capiq_company_id in
-                          (
+                                 (
                                  select distinct CIC.CompanyID from CompanyIDComm CIC
                                  inner join  DebtIssuance_Short DIS
                                  on CIC.CompanyID = DIS.CompanyID
-)",
+                                 )",
                           stringsAsFactors = FALSE, as.is = TRUE, 
                           na.string = c("NULL", "NA", ""))
 
@@ -63,11 +63,11 @@ IncomeStatement.2use <- sqlQuery(conn, "select * from income_statement CF  where
 ######################
 
 BalanceSheet.2use <- sqlQuery(conn, "select * from balance_sheet CF  where CF.capiq_company_id in
-                          (
-                          	select distinct CIC.CompanyID from CompanyIDComm CIC
-	inner join  DebtIssuance_Short DIS
-                          on CIC.CompanyID = DIS.CompanyID
-                          )",
+                              (
+                              select distinct CIC.CompanyID from CompanyIDComm CIC
+                              inner join  DebtIssuance_Short DIS
+                              on CIC.CompanyID = DIS.CompanyID
+                              )",
                           stringsAsFactors = FALSE, as.is = TRUE, 
                           na.string = c("NULL", "NA", ""))
 
