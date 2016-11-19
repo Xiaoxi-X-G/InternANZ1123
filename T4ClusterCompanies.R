@@ -10,9 +10,32 @@ DataPath <- "C:/gxx/Database/internanz1123/debt_issuance"
 
 
 ##### Step1 ####
-# Import financial data, and combine into single file
+### Cluster companies based on a particular currency, eg USD
 
-### 1.1 Import Data
+### From Data Visual: one company may issue multi-debt in different currencies, which
+### end up with a high total score, but it doesn't necessary mean that it is the leader for
+### all currencies it has issued the debts.
+
+library(plyr)
+CompanyScore.Finial <- read.csv(paste(DataPath, "/FinialCompanyScore.csv",sep=""), 
+                                stringsAsFactors = F)
+
+KNNResults <- kmeans(CompanyScore.Finial$USD, 
+                     centers = 2, iter.max = 100, nstart = 10,
+                     algorithm = c("Lloyd"))
+
+Leaders <- data.frame(CompanyID = CompanyScore.Finial$CompanyID,
+                      Score = CompanyScore.Finial$USD,
+                      IsLeader = as.character(KNNResults$cluster),
+                      stringsAsFactors = F)
+
+Leaders$IsLeader <- revalue(Leaders$IsLeader, c("1"="Y", "2"= "N") )# Y is leader
+
+##### Step2 ####
+# Import financial data: Incomestatement, Balance sheet and cashflow ,
+# and combine into single file
+
+### 2.1 Import Data
 CompanyScore.Finial <- read.csv(paste(DataPath, "/FinialCompanyScore.csv", sep=""),
                                 stringsAsFactors = F)
 IncomeStatement <- read.csv(paste(DataPath, "/IncomeStatement_Filtered3.csv", sep=""),
@@ -24,7 +47,7 @@ Cashflow <- read.csv(paste(DataPath, "/Cashflow_Filtered3.csv", sep=""),
 
 
 
-### 1.2 For each CompanyID, check if there are repeated Period --- NO
+###2.2 For each CompanyID, check if there are repeated Period --- NO
 ToCheck <- IncomeStatement
 
 ID2Check <- c()
@@ -38,7 +61,7 @@ for (m in unique(ToCheck$capiq_company_id)){
 
 
 
-###1.3 Combine Data, using CompanyID and Period
+###2.3 Combine Data, using CompanyID and Period
 BalanceSheet$period <- as.numeric(substr(BalanceSheet$period, start = 3, stop = 8))
 Cashflow$period <- as.numeric(substr(Cashflow$period, start = 3, stop = 8))
 IncomeStatement$period <- as.numeric(substr(IncomeStatement$period, start = 3, stop = 8))
@@ -91,9 +114,8 @@ for (m in CommCompanyID){
 AllFinancialData <- read.csv(paste(DataPath, "/AllFinancialData.csv", sep=""),
                              stringsAsFactors = F)
 
-####Step2#######
+####Step3#######
 ### Delete duplicated columns, and columns with high correlation  
-library(caret)
 
 AllFinancialData.filtered <- 
   AllFinancialData[, c(1: which(colnames(AllFinancialData)=="period"))]
@@ -102,6 +124,17 @@ AllFinancialData.filtered$filing_date <-
   as.integer(as.Date(AllFinancialData.filtered$filing_date))
 
 AllFinancialData.filtered <- AllFinancialData.filtered[, -c(2:6)]
+
+
+### Check if iq_total_assets changes for a company: 
+ # Not change --- Use total_assets as reference 
+for (v in unique(AllFinancialData.filtered$capiq_company_id)){
+  INDS <- which(AllFinancialData.filtered$capiq_company_id == v)
+  if (length(unique(AllFinancialData.filtered$latest_iq_total_assets[INDS])) > 1){
+    print(v)
+  }
+}
+
 
 correlationMatrix <- cor(AllFinancialData.filtered, 
                          use = "pairwise.complete.obs")
@@ -115,8 +148,14 @@ AllFinancialData.filtered2.order <-
 
 colnames(AllFinancialData.filtered2.order)[[1]] <- "period"
 
+## Add total_assets as reference
+AllFinancialData.filtered2.order$latest_iq_total_assets <-
+  AllFinancialData.filtered$latest_iq_total_assets
+
 # write.csv(AllFinancialData.filtered2.order, paste(DataPath, "/AllFinancialData.filtered2.order.csv", sep=""),
 #           quote = F, row.names = F)
+
+
 
 
 AllFinancialData.filtered2.order <- 
@@ -134,10 +173,9 @@ AllFinancialData.filtered2.order[which(AllFinancialData.filtered2.order$capiq_co
 ## lowest score
 AllFinancialData.filtered2.order[which(AllFinancialData.filtered2.order$capiq_company_id == "3116362"),]
 
+#### Output data for Tableau Dashboard ######
 
-
-### Re-design matrix2 for display in Tableau
-
+###1. Re-design matrix2 (Company Score) for display in Tableau
 CompanyScore.Finial.Redesinged <- data.frame()
 yy <- 0
 for (w in 1:nrow(CompanyScore.Finial)){
@@ -157,8 +195,7 @@ for (w in 1:nrow(CompanyScore.Finial)){
 #           quote = F, row.names = F)
 
 
-
-### Re-design matrix2 for display in Tableau
+###2 Re-design matrix2(Financial Data) for display in Tableau
 AllFinancialData.filtered2.order.redesign <- data.frame()
 v <- 0
 for (v in 1:nrow(AllFinancialData.filtered2.order)){
@@ -179,6 +216,56 @@ for (v in 1:nrow(AllFinancialData.filtered2.order)){
   AllFinancialData.filtered2.order.redesign <- rbind(AllFinancialData.filtered2.order.redesign,
                                                      df.temp2)
 }
-write.csv(AllFinancialData.filtered2.order.redesign, 
-          paste(DataPath, "/AllFinancialData.filtered2.order.redesign.csv", sep=""),
-          quote = F, row.names = F)
+# write.csv(AllFinancialData.filtered2.order.redesign, 
+#           paste(DataPath, "/AllFinancialData.filtered2.order.redesign.csv", sep=""),
+#           quote = F, row.names = F)
+
+####Step4####
+##### Aggregate each company report, take avg
+AllFinancialData.filtered2.order.agg <- data.frame()
+AllFinancialData.filtered2.order.agg01 <- data.frame()
+
+for (o in unique(AllFinancialData.filtered2.order$capiq_company_id)){
+  Ind <- which(AllFinancialData.filtered2.order$capiq_company_id == o)
+  df.temp <- unname(colMeans(AllFinancialData.filtered2.order[Ind,], na.rm = T))
+  df.temp[which(is.nan(df.temp))]<-0
+  AllFinancialData.filtered2.order.agg <- rbind(AllFinancialData.filtered2.order.agg, df.temp)
+  
+  df.temp01 <- df.temp #norlize to [0 1]
+  df.temp01[c(3: length(df.temp01))] <- df.temp[c(3: length(df.temp01))]/tail(df.temp, n=1)
+  AllFinancialData.filtered2.order.agg01 <- rbind(AllFinancialData.filtered2.order.agg01, df.temp01)
+}
+colnames(AllFinancialData.filtered2.order.agg) <- names(AllFinancialData.filtered2.order)
+colnames(AllFinancialData.filtered2.order.agg01) <- names(AllFinancialData.filtered2.order)
+
+
+AllFinancialData.filtered2.order.agg <- AllFinancialData.filtered2.order.agg[,-1]
+AllFinancialData.filtered2.order.agg01 <- AllFinancialData.filtered2.order.agg01[,-1]
+
+### Check if any entry > 1
+GreaterThanAssestInd <- c()
+CheckData <- AllFinancialData.filtered2.order.agg01
+for (i in 1:nrow(CheckData)){
+  ColInd <- which(CheckData[i, c(2: ncol(CheckData))] > 1)
+  if (length(ColInd)>= 1){
+    print(CheckData[i,c(1, (1+ColInd))])
+    #print(i)
+    GreaterThanAssestInd<-c(GreaterThanAssestInd, i)
+  }
+}
+length(GreaterThanAssestInd)/ nrow(CheckData) #0.1687396 
+
+
+
+### Output prepared data for modelling
+PreparedData <- AllFinancialData.filtered2.order.agg01
+Inds <- match(AllFinancialData.filtered2.order.agg01$capiq_company_id,
+              Leaders$CompanyID)
+PreparedData$IsLeader <- Leaders[Inds,3]
+
+
+# write.csv(PreparedData, file = paste(DataPath, "/PreparedData.csv", sep=""),
+#       quote = F, row.names =  F)
+
+
+
