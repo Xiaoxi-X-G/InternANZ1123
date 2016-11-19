@@ -58,4 +58,10 @@ df.CompanyScore$TotalScore <- rowSums(df.CompanyScore[,-1])
 
 Finial.CompanyScore <- df.CompanyScore[order(df.CompanyScore$TotalScore, decreasing = T),]
 
-plot(sort(Finial.CompanyScore$AUD, decreasing =T))
+# write.csv(Finial.CompanyScore, file = paste(DataPath, "/FinialCompanyScore.csv", sep=""),
+#       quote = F, row.names =  F)
+
+plot(sort(Finial.CompanyScore$TotalScore, decreasing =T))
+
+
+
