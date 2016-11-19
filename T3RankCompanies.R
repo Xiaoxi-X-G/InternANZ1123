@@ -62,3 +62,6 @@ Finial.CompanyScore <- df.CompanyScore[order(df.CompanyScore$TotalScore, decreas
 #       quote = F, row.names =  F)
 
 plot(sort(Finial.CompanyScore$TotalScore, decreasing =T))
+
+
+
