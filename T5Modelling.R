@@ -258,7 +258,7 @@ library(pROC)
 glm.probs <- predict(Logistic1, Testing.data, type = "prob")
 glm.ROC <- roc(response = Testing.data$IsLeader,
                predictor = glm.probs$Y,
-               levels = levels(as.factor(Testing.data$IsLeader)))
+               levels = levels(as.factor(Testing.data$IsLeader))) 
 plot(glm.ROC, type = "S")
 
 
