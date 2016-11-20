@@ -29,7 +29,7 @@ Leaders <- data.frame(CompanyID = CompanyScore.Finial$CompanyID,
                       IsLeader = as.character(KNNResults$cluster),
                       stringsAsFactors = F)
 
-Leaders$IsLeader <- revalue(Leaders$IsLeader, c("1"="Y", "2"= "N") )# Y is leader
+Leaders$IsLeader <- revalue(Leaders$IsLeader, c("1"="Y", "2"= "N") )
 
 ##### Step2 ####
 # Import financial data: Incomestatement, Balance sheet and cashflow ,
@@ -258,8 +258,8 @@ length(GreaterThanAssestInd)/ nrow(CheckData) #0.1687396
 
 
 ### Output prepared data for modelling
-PreparedData <- AllFinancialData.filtered2.order.agg01
-Inds <- match(AllFinancialData.filtered2.order.agg01$capiq_company_id,
+PreparedData <- AllFinancialData.filtered2.order.agg
+Inds <- match(AllFinancialData.filtered2.order.agg$capiq_company_id,
               Leaders$CompanyID)
 PreparedData$IsLeader <- Leaders[Inds,3]
 

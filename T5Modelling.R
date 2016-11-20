@@ -20,8 +20,8 @@ PreparedData <- read.csv(paste(DataPath, "/PreparedData.csv", sep=""),
 set.seed(23)
 RowInd.Train <- createDataPartition(PreparedData$IsLeader, p = 0.75, list = F)
 
-Training.data <- PreparedData[RowInd.Train, -1]
-Testing.data <- PreparedData[-RowInd.Train, -1]
+Training.data <- PreparedData[RowInd.Train, c(-1,-2)]
+Testing.data <- PreparedData[-RowInd.Train, c(-1,-2)]
 
 ### Setup model training parameters used in K–fold cross–validation 
 cv.ctrl <- trainControl(method = "repeatedcv",
@@ -39,7 +39,7 @@ cv.ctrl <- trainControl(method = "repeatedcv",
 
 # Use all the features
 set.seed(35)
-Logistic1 <- train(IsLeader ~ . -latest_iq_total_assets,
+Logistic1 <- train(IsLeader ~ . ,
                  data = Training.data,
                  method = "glm",
                  metric = "ROC",
