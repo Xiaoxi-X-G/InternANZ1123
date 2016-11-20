@@ -20,6 +20,12 @@ library(plyr)
 CompanyScore.Finial <- read.csv(paste(DataPath, "/FinialCompanyScore.csv",sep=""), 
                                 stringsAsFactors = F)
 
+
+# WWW <- order(CompanyScore.Finial$CNY, decreasing=T)
+# which(WWW ==4)
+
+CompanyScore.Finial$USD[WWW]
+
 KNNResults <- kmeans(CompanyScore.Finial$USD, 
                      centers = 2, iter.max = 100, nstart = 10,
                      algorithm = c("Lloyd"))
@@ -262,9 +268,9 @@ PreparedData <- AllFinancialData.filtered2.order.agg
 Inds <- match(AllFinancialData.filtered2.order.agg$capiq_company_id,
               Leaders$CompanyID)
 PreparedData$IsLeader <- Leaders[Inds,3]
+PreparedData$USDScore <-  Leaders[Inds,2]
 
-
-# write.csv(PreparedData, file = paste(DataPath, "/PreparedData.csv", sep=""),
+# write.csv(PreparedData, file = paste(DataPath, "/PreparedDataALL100000.csv", sep=""),
 #       quote = F, row.names =  F)
 
 

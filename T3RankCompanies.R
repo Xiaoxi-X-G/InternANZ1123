@@ -65,3 +65,4 @@ plot(sort(Finial.CompanyScore$TotalScore, decreasing =T))
 
 
 
+

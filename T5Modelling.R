@@ -20,8 +20,8 @@ PreparedData <- read.csv(paste(DataPath, "/PreparedData.csv", sep=""),
 set.seed(23)
 RowInd.Train <- createDataPartition(PreparedData$IsLeader, p = 0.75, list = F)
 
-Training.data <- PreparedData[RowInd.Train, c(-1,-2)]
-Testing.data <- PreparedData[-RowInd.Train, c(-1,-2)]
+Training.data <- PreparedData[RowInd.Train, c(-1)]
+Testing.data <- PreparedData[-RowInd.Train, c(-1)]
 
 ### Setup model training parameters used in K–fold cross–validation 
 cv.ctrl <- trainControl(method = "repeatedcv",
@@ -37,6 +37,7 @@ cv.ctrl <- trainControl(method = "repeatedcv",
 ### Step1 ##### 
 ##Logistic modelling for Inference/interpretation
 
+
 # Use all the features
 set.seed(35)
 Logistic1 <- train(IsLeader ~ . ,
@@ -47,7 +48,11 @@ Logistic1 <- train(IsLeader ~ . ,
 Logistic1
 summary(Logistic1)
 
+DependVar <- data.frame(Name = names(Training.data),
+                        Value = 0)
 
+write.csv(DependVar, paste(DataPath, "/DependVar.csv", sep=""),
+          quote = F, row.names = F) 
 # Use limited features
 set.seed(35)
 Logistic2 <- train(IsLeader ~ IQ_LT_INVEST
@@ -254,7 +259,7 @@ library(pROC)
 # probabilities to plot the ROC curves.
 
 
-# logistic = 0.7117
+# logistic = 0.7053
 glm.probs <- predict(Logistic1, Testing.data, type = "prob")
 glm.ROC <- roc(response = Testing.data$IsLeader,
                predictor = glm.probs$Y,
@@ -262,14 +267,14 @@ glm.ROC <- roc(response = Testing.data$IsLeader,
 plot(glm.ROC, type = "S")
 
 
-# Boost model = 0.7432
+# Boost model = 0.7537
 ada.probs <- predict(ada.tune1, Testing.data, type = "prob")
 ada.ROC <- roc(response = Testing.data$IsLeader,
                predictor = ada.probs$Y,
                levels = levels(as.factor(Testing.data$IsLeader)))
 plot(ada.ROC, add=T, col = "green")
 
-# RF = 0.7376
+# RF = 0.7545
 rf.probs <- predict(rf.tune1, Testing.data, type = "prob")
 rf.ROC <- roc(response = Testing.data$IsLeader,
               predictor = rf.probs$Y,
@@ -277,7 +282,7 @@ rf.ROC <- roc(response = Testing.data$IsLeader,
 plot(rf.ROC, add = T, col = "red")
 
 
-# SVM = 0.6936
+# SVM = 0.6927
 svm.probs <- predict(svm.tune1, Testing.data, type = "prob")
 svm.ROC <- roc(response = Testing.data$IsLeader,
                predictor = svm.probs$Y,
