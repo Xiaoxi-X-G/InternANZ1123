@@ -7,16 +7,19 @@ DataPath <- "C:/gxx/Database/internanz1123/debt_issuance"
 # so that there is a spread of leaders and followers
 ##########################################################
 
+library(plyr)
 
+# Step1: Cluster companies based on a particular currency, ie, USD
+# Step2: Import and combine financial data: Incomestatement, Balance sheet and cashflow  
+# Step3: Aggregate each company's financial data 
 
 ##### Step1 ####
-### Cluster companies based on a particular currency, eg USD
+### Cluster companies based on a particular currency, ie USD
 
 ### From Data Visual: one company may issue multi-debt in different currencies, which
 ### end up with a high total score, but it doesn't necessary mean that it is the leader for
 ### all currencies it has issued the debts.
 
-library(plyr)
 CompanyScore.Finial <- read.csv(paste(DataPath, "/FinialCompanyScore.csv",sep=""), 
                                 stringsAsFactors = F)
 
@@ -38,8 +41,7 @@ Leaders <- data.frame(CompanyID = CompanyScore.Finial$CompanyID,
 Leaders$IsLeader <- revalue(Leaders$IsLeader, c("1"="Y", "2"= "N") )
 
 ##### Step2 ####
-# Import financial data: Incomestatement, Balance sheet and cashflow ,
-# and combine into single file
+# Import and combine financial data: Incomestatement, Balance sheet and cashflow 
 
 ### 2.1 Import Data
 CompanyScore.Finial <- read.csv(paste(DataPath, "/FinialCompanyScore.csv", sep=""),
@@ -120,6 +122,7 @@ for (m in CommCompanyID){
 AllFinancialData <- read.csv(paste(DataPath, "/AllFinancialData.csv", sep=""),
                              stringsAsFactors = F)
 
+
 ####Step3#######
 ### Delete duplicated columns, and columns with high correlation  
 
@@ -162,8 +165,6 @@ AllFinancialData.filtered2.order$latest_iq_total_assets <-
 #           quote = F, row.names = F)
 
 
-
-
 AllFinancialData.filtered2.order <- 
   read.csv(paste(DataPath, "/AllFinancialData_filtered2_order.csv", sep= ""), stringsAsFactors = F)
 
@@ -178,6 +179,7 @@ AllFinancialData.filtered2.order[which(AllFinancialData.filtered2.order$capiq_co
 
 ## lowest score
 AllFinancialData.filtered2.order[which(AllFinancialData.filtered2.order$capiq_company_id == "3116362"),]
+
 
 #### Output data for Tableau Dashboard ######
 
@@ -201,7 +203,7 @@ for (w in 1:nrow(CompanyScore.Finial)){
 #           quote = F, row.names = F)
 
 
-###2 Re-design matrix2(Financial Data) for display in Tableau
+###2. Re-design matrix2(Financial Data) for display in Tableau
 AllFinancialData.filtered2.order.redesign <- data.frame()
 v <- 0
 for (v in 1:nrow(AllFinancialData.filtered2.order)){
@@ -226,8 +228,9 @@ for (v in 1:nrow(AllFinancialData.filtered2.order)){
 #           paste(DataPath, "/AllFinancialData.filtered2.order.redesign.csv", sep=""),
 #           quote = F, row.names = F)
 
+
 ####Step4####
-##### Aggregate each company report, take avg
+##### Aggregate each company's report 
 AllFinancialData.filtered2.order.agg <- data.frame()
 AllFinancialData.filtered2.order.agg01 <- data.frame()
 

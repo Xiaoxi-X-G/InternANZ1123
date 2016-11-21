@@ -9,10 +9,21 @@ DataPath <- "C:/gxx/Database/internanz1123/debt_issuance"
 
 require(caret)
 require(pROC)
+require(ada)
+require(randomForest)
+require(kernlab)
+require(e1071)
+require(pROC)
+
+
+# Step0: Partition data for traning (75%) and testing (25%) 
+# Step1: Inference modelling: Logistic regression
+# Step2: Predictive modelling - boosting, random forest
+# Step3: Model validation
+
 
 
 ### Step0####
-
 ##Partition data for traning (75%) and testing (25%) 
 PreparedData <- read.csv(paste(DataPath, "/PreparedData.csv", sep=""),
                          stringsAsFactors = F)
@@ -35,8 +46,9 @@ cv.ctrl <- trainControl(method = "repeatedcv",
 
 
 ### Step1 ##### 
-##Logistic modelling for Inference/interpretation
+#######Inference modelling: Logistic regression
 
+##
 
 # Use all the features
 set.seed(35)
@@ -53,6 +65,7 @@ DependVar <- data.frame(Name = names(Training.data),
 
 write.csv(DependVar, paste(DataPath, "/DependVar.csv", sep=""),
           quote = F, row.names = F) 
+
 # Use limited features
 set.seed(35)
 Logistic2 <- train(IsLeader ~ IQ_LT_INVEST
@@ -72,7 +85,8 @@ Logistic2
 summary(Logistic2)
 
 
-### Step2: predictive modelling (boosting, svm, rf) for accuracy
+##### Step2 ####
+#### predictive modelling - boosting and random forest
 
 #####2.1: boosting
 # In particular, boosting is to find stronger and more comprehesive 
@@ -85,7 +99,6 @@ summary(Logistic2)
 # ..., continue, until .depth or accuracy met
 
 
-require(ada)
 
 ada.grid <- expand.grid(.iter = c(50, 100),
                         .maxdepth = c(4, 10),
@@ -136,7 +149,6 @@ plot.train(ada.tune2)
 #produce finial predicts.
 
 
-require(randomForest)
 
 # Use all feature
 set.seed(35)
@@ -172,54 +184,13 @@ rf.tune2 <- train(IsLeader ~ IQ_LT_INVEST
 rf.tune2
 
 
-
-## svm
-require(kernlab)
-# Use Kernel to separate data one the observation feature space
-# One of the population is Radial Kernel to meature the distance 
-# between observations,
-# ie: exp(-gamma sum(Xi-Xj)^2)
+ 
 
 
-#As SVM is considered sensitive to the scale and magnitude of the 
-# presented features, I'll use the preProcess argument to instruct 
-# train to make arrangements for normalizing 
-
-# Use all feature
-set.seed(35)
-svm.tune1 <- train(IsLeader ~ .-latest_iq_total_assets,
-                  data = Training.data,
-                  method = "svmRadial",
-                  tuneLength = 9,
-                  preProcess = c("center", "scale"),
-                  metric = "ROC",
-                  trControl =  cv.ctrl)
-
-svm.tune1
-
-## use limited features
-set.seed(35)
-svm.tune2 <- train(IsLeader ~ IQ_LT_INVEST
-                   +IQ_NI_AVAIL_INCL
-                   +IQ_NON_CASH_ITEMS
-                   +IQ_OTHER_FINANCE_ACT_SUPPL
-                   +IQ_OTHER_INVESTING
-                   +IQ_OTHER_OPER_ACT
-                   +IQ_PROPERTY_NET
-                   +IQ_TREASURY_OTHER_EQUITY
-                   +latest_iq_rev,
-                   data = Training.data,
-                   method = "svmRadial",
-                   tuneLength = 9,
-                   preProcess = c("center", "scale"),
-                   metric = "ROC",
-                   trControl =  cv.ctrl)
-
-svm.tune2
 
 ## step3: #####
-# model evaluation
-library(e1071)
+#### Model validation
+
 
 # Logistics
 glm.pred1 <- predict(Logistic1, Testing.data)
@@ -228,7 +199,7 @@ confusionMatrix(glm.pred1, Testing.data$IsLeader)
 glm.pred2 <- predict(Logistic2, Testing.data)
 confusionMatrix(glm.pred2, Testing.data$IsLeader)
 
-# Boosted 
+# Boost 
 ada.pred1 <- predict(ada.tune1, Testing.data)
 confusionMatrix(ada.pred1, Testing.data$IsLeader)
 
@@ -243,17 +214,9 @@ confusionMatrix(rf.pred1, Testing.data$IsLeader)
 rf.pred2 <- predict(rf.tune2, Testing.data)
 confusionMatrix(rf.pred2, Testing.data$IsLeader)
 
-
-# SVM
-svm.pred1 <- predict(svm.tune1, Testing.data)
-confusionMatrix(svm.pred1, Testing.data$IsLeader)
-
-svm.pred2 <- predict(svm.tune2, Testing.data)
-confusionMatrix(svm.pred2, Testing.data$IsLeader)
+ 
 
 
-
-library(pROC)
 # We can also calculate, using each of the four fitted models, 
 # the predicted probabilities for the test.batch, and use those 
 # probabilities to plot the ROC curves.
@@ -280,15 +243,7 @@ rf.ROC <- roc(response = Testing.data$IsLeader,
               predictor = rf.probs$Y,
               levels = levels(as.factor(Testing.data$IsLeader)))
 plot(rf.ROC, add = T, col = "red")
-
-
-# SVM = 0.6927
-svm.probs <- predict(svm.tune1, Testing.data, type = "prob")
-svm.ROC <- roc(response = Testing.data$IsLeader,
-               predictor = svm.probs$Y,
-               levels = levels(as.factor(Testing.data$IsLeader)))
-plot(svm.ROC, add = T, col = "blue")
-
+ 
 
 
 
