@@ -1,6 +1,5 @@
-rm(list = ls())
 getMKLthreads()
-DataPath <- "C:/gxx/Database/internanz1123/debt_issuance"
+DataPath <- "C:/DataAnalysis/Data/anz_debt_issuance"
 
 ######################Task 4 ############################
 #4. Cluster companies based on their financial metrics, 
@@ -12,6 +11,8 @@ library(plyr)
 # Step1: Cluster companies based on a particular currency, ie, USD
 # Step2: Import and combine financial data: Incomestatement, Balance sheet and cashflow  
 # Step3: Aggregate each company's financial data 
+
+
 
 ##### Step1 ####
 ### Cluster companies based on a particular currency, ie USD
@@ -39,6 +40,7 @@ Leaders <- data.frame(CompanyID = CompanyScore.Finial$CompanyID,
                       stringsAsFactors = F)
 
 Leaders$IsLeader <- revalue(Leaders$IsLeader, c("1"="Y", "2"= "N") )
+
 
 ##### Step2 ####
 # Import and combine financial data: Incomestatement, Balance sheet and cashflow 
@@ -123,7 +125,7 @@ AllFinancialData <- read.csv(paste(DataPath, "/AllFinancialData.csv", sep=""),
                              stringsAsFactors = F)
 
 
-####Step3#######
+#### Step3#######
 ### Delete duplicated columns, and columns with high correlation  
 
 AllFinancialData.filtered <- 
@@ -181,7 +183,7 @@ AllFinancialData.filtered2.order[which(AllFinancialData.filtered2.order$capiq_co
 AllFinancialData.filtered2.order[which(AllFinancialData.filtered2.order$capiq_company_id == "3116362"),]
 
 
-#### Output data for Tableau Dashboard ######
+#### Output data for visualization ######
 
 ###1. Re-design matrix2 (Company Score) for display in Tableau
 CompanyScore.Finial.Redesinged <- data.frame()
@@ -229,8 +231,8 @@ for (v in 1:nrow(AllFinancialData.filtered2.order)){
 #           quote = F, row.names = F)
 
 
-####Step4####
-##### Aggregate each company's report 
+#### Step4####
+##### Aggregate each company's financial data 
 AllFinancialData.filtered2.order.agg <- data.frame()
 AllFinancialData.filtered2.order.agg01 <- data.frame()
 

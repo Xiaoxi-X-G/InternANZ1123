@@ -7,10 +7,18 @@ DataPath <- "C:/DataAnalysis/Data/anz_debt_issuance"
 # to remove data not from companies with debt issuances.
 ##########################################################
 
-
-####1. Find CompanyIDs by inner join  cashflow, balance_sheet, income_statement####
-
 library(RODBC)
+
+#Step1: Find CompanyIDs by inner join  cashflow, balance_sheet, income_statement
+#Step2: Import "CompanyIDComm" to SQL
+#Step3: Filter all other files using CompanyIDComm & Balance_Issuance 
+#Step4: Filter out "NULL" columns
+
+
+
+####Step1 ####
+###Find CompanyIDs by inner join  cashflow, balance_sheet, income_statement
+
 odbcDataSources()
 conn<-odbcConnect(dsn="localdb") 
 
@@ -30,9 +38,12 @@ CompanyID.Common <- sqlQuery(conn, "select distinct CF.capiq_company_id AS DebtI
 #           row.names = F, quote =  F)
 
 
-####2. Import "CompanyIDComm" to SQL #####
+####Step2#####
+##Import "CompanyIDComm" to SQL 
 
-####3. Filter all other fills, CompanyIDComm & Balance_Issuance  #####
+
+####Step3 #####
+#  Filter all other fills, CompanyIDComm & Balance_Issuance 
 Cashflow.2use <- sqlQuery(conn, "select * from interanz1123.dbo.cashflow CF
                           where CF.capiq_company_id in
                           (
@@ -75,9 +86,8 @@ BalanceSheet.2use <- sqlQuery(conn, "select * from interanz1123.dbo.balance_shee
 #           row.names = F, quote =  F)
 
 
-
-#### Filter out "NULL" columns ####
-###
+####Step4####
+###Filter out "NULL" columns
 Col2Keep <- function(InputData, Percentage){
   NACols <- apply(InputData, MARGIN = 2, function(x, y=nrow(InputData)){ 
     length(which(is.na(x)))/y}

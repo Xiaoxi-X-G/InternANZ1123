@@ -1,5 +1,5 @@
 getMKLthreads()
-DataPath <- "C:/gxx/Database/internanz1123/debt_issuance"
+DataPath <- "C:/DataAnalysis/Data/anz_debt_issuance"
 
 ##############################################################
 ##5. Given the clusters, create some explanation on why these 
@@ -41,8 +41,6 @@ cv.ctrl <- trainControl(method = "repeatedcv",
                         classProbs = T, # use ROC curve to find probiblity
                         summaryFunction = twoClassSummary
 )
-
-
 
 
 ### Step1 ##### 
@@ -187,8 +185,7 @@ rf.tune2
  
 
 
-
-## step3: #####
+## step3 #####
 #### Model validation
 
 
