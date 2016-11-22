@@ -25,10 +25,6 @@ CompanyScore.Finial <- read.csv(paste(DataPath, "/FinialCompanyScore.csv",sep=""
                                 stringsAsFactors = F)
 
 
-# WWW <- order(CompanyScore.Finial$CNY, decreasing=T)
-# which(WWW ==4)
-
-CompanyScore.Finial$USD[WWW]
 
 KNNResults <- kmeans(CompanyScore.Finial$USD, 
                      centers = 2, iter.max = 100, nstart = 10,
@@ -168,67 +164,61 @@ AllFinancialData.filtered2.order$latest_iq_total_assets <-
 
 
 AllFinancialData.filtered2.order <- 
-  read.csv(paste(DataPath, "/AllFinancialData_filtered2_order.csv", sep= ""), stringsAsFactors = F)
+  read.csv(paste(DataPath, "/AllFinancialData.filtered2.order.csv", sep= ""), stringsAsFactors = F)
 
-### check, common columns  
-length(intersect(colnames(Cashflow),colnames(AllFinancialData.filtered2)))
-length(intersect(colnames(BalanceSheet),colnames(AllFinancialData.filtered2)))
-length(intersect(colnames(IncomeStatement),colnames(AllFinancialData.filtered2)))
+# ### check, common columns  
+# length(intersect(colnames(Cashflow),colnames(AllFinancialData.filtered2)))
+# length(intersect(colnames(BalanceSheet),colnames(AllFinancialData.filtered2)))
+# length(intersect(colnames(IncomeStatement),colnames(AllFinancialData.filtered2)))
 
-
-## highest score
-AllFinancialData.filtered2.order[which(AllFinancialData.filtered2.order$capiq_company_id == "3648306"),]
-
-## lowest score
-AllFinancialData.filtered2.order[which(AllFinancialData.filtered2.order$capiq_company_id == "3116362"),]
 
 
 #### Output data for visualization ######
 
-###1. Re-design matrix2 (Company Score) for display in Tableau
-CompanyScore.Finial.Redesinged <- data.frame()
-yy <- 0
-for (w in 1:nrow(CompanyScore.Finial)){
-  yy <- yy + 1 
-  IndName <- colnames(CompanyScore.Finial)[which(CompanyScore.Finial[w,] > 0)]
-  IndValue <- CompanyScore.Finial[w, IndName]
-  lg <- length(IndValue)
-  df.temp <- data.frame(CompanyID = rep(as.integer(unname(IndValue[1])), (lg-1)), 
-                        Currency = tail(names(IndValue), n =(lg-1)), 
-                        Score= tail(as.numeric(unname(IndValue)), n =(lg-1)),
-                        stringsAsFactors = F)
-  
-  CompanyScore.Finial.Redesinged<-rbind(CompanyScore.Finial.Redesinged, df.temp)
-  
-}
-# write.csv(CompanyScore.Finial.Redesinged, paste(DataPath, "/CompanyScore_Finial_Redesinged.csv", sep=""),
-#           quote = F, row.names = F)
-
-
-###2. Re-design matrix2(Financial Data) for display in Tableau
-AllFinancialData.filtered2.order.redesign <- data.frame()
-v <- 0
-for (v in 1:nrow(AllFinancialData.filtered2.order)){
-  v <- v+1
-  print(121070-v)
-  
-  IndName2 <- 
-    colnames(AllFinancialData.filtered2.order)[which(!is.na(AllFinancialData.filtered2.order[v,]) )]
-  
-  IndValue2 <- AllFinancialData.filtered2.order[v, IndName2]
-  lg2 <- length(IndValue2)
-  df.temp2 <- data.frame(CompanyID = rep(as.integer(unname(IndValue2[2])), (lg2-2)),
-                         Period = rep(as.numeric(unname(IndValue2[1])), (lg2-2)),
-                         Terms = tail(names(IndValue2), n =(lg2-2)) ,
-                         Value =  tail(as.numeric(unname(IndValue2)), n =(lg2-2)),
-                         stringsAsFactors = F)
-  
-  AllFinancialData.filtered2.order.redesign <- rbind(AllFinancialData.filtered2.order.redesign,
-                                                     df.temp2)
-}
-# write.csv(AllFinancialData.filtered2.order.redesign, 
-#           paste(DataPath, "/AllFinancialData.filtered2.order.redesign.csv", sep=""),
-#           quote = F, row.names = F)
+# ###1. Re-design matrix2 (Company Score) for display in Tableau
+# CompanyScore.Finial.Redesinged <- data.frame()
+# yy <- 0
+# for (w in 1:nrow(CompanyScore.Finial)){
+#   yy <- yy + 1 
+#   IndName <- colnames(CompanyScore.Finial)[which(CompanyScore.Finial[w,] > 0)]
+#   IndValue <- CompanyScore.Finial[w, IndName]
+#   lg <- length(IndValue)
+#   df.temp <- data.frame(CompanyID = rep(as.integer(unname(IndValue[1])), (lg-1)), 
+#                         Currency = tail(names(IndValue), n =(lg-1)), 
+#                         Score= tail(as.numeric(unname(IndValue)), n =(lg-1)),
+#                         stringsAsFactors = F)
+#   
+#   CompanyScore.Finial.Redesinged<-rbind(CompanyScore.Finial.Redesinged, df.temp)
+#   
+# }
+# # write.csv(CompanyScore.Finial.Redesinged, paste(DataPath, "/CompanyScore_Finial_Redesinged.csv", sep=""),
+# #           quote = F, row.names = F)
+# 
+# 
+# ###2. Re-design matrix2(Financial Data) for display in Tableau
+# AllFinancialData.filtered2.order.redesign <- data.frame()
+# v <- 0
+# for (v in 1:nrow(AllFinancialData.filtered2.order)){
+#   v <- v+1
+#   print(121070-v)
+#   
+#   IndName2 <- 
+#     colnames(AllFinancialData.filtered2.order)[which(!is.na(AllFinancialData.filtered2.order[v,]) )]
+#   
+#   IndValue2 <- AllFinancialData.filtered2.order[v, IndName2]
+#   lg2 <- length(IndValue2)
+#   df.temp2 <- data.frame(CompanyID = rep(as.integer(unname(IndValue2[2])), (lg2-2)),
+#                          Period = rep(as.numeric(unname(IndValue2[1])), (lg2-2)),
+#                          Terms = tail(names(IndValue2), n =(lg2-2)) ,
+#                          Value =  tail(as.numeric(unname(IndValue2)), n =(lg2-2)),
+#                          stringsAsFactors = F)
+#   
+#   AllFinancialData.filtered2.order.redesign <- rbind(AllFinancialData.filtered2.order.redesign,
+#                                                      df.temp2)
+# }
+# # write.csv(AllFinancialData.filtered2.order.redesign, 
+# #           paste(DataPath, "/AllFinancialData.filtered2.order.redesign.csv", sep=""),
+# #           quote = F, row.names = F)
 
 
 #### Step4####
@@ -251,20 +241,20 @@ colnames(AllFinancialData.filtered2.order.agg01) <- names(AllFinancialData.filte
 
 
 AllFinancialData.filtered2.order.agg <- AllFinancialData.filtered2.order.agg[,-1]
-AllFinancialData.filtered2.order.agg01 <- AllFinancialData.filtered2.order.agg01[,-1]
+#AllFinancialData.filtered2.order.agg01 <- AllFinancialData.filtered2.order.agg01[,-1]
 
-### Check if any entry > 1
-GreaterThanAssestInd <- c()
-CheckData <- AllFinancialData.filtered2.order.agg01
-for (i in 1:nrow(CheckData)){
-  ColInd <- which(CheckData[i, c(2: ncol(CheckData))] > 1)
-  if (length(ColInd)>= 1){
-    print(CheckData[i,c(1, (1+ColInd))])
-    #print(i)
-    GreaterThanAssestInd<-c(GreaterThanAssestInd, i)
-  }
-}
-length(GreaterThanAssestInd)/ nrow(CheckData) #0.1687396 
+# ### Check if any entry > 1
+# GreaterThanAssestInd <- c()
+# CheckData <- AllFinancialData.filtered2.order.agg01
+# for (i in 1:nrow(CheckData)){
+#   ColInd <- which(CheckData[i, c(2: ncol(CheckData))] > 1)
+#   if (length(ColInd)>= 1){
+#     print(CheckData[i,c(1, (1+ColInd))])
+#     #print(i)
+#     GreaterThanAssestInd<-c(GreaterThanAssestInd, i)
+#   }
+# }
+# length(GreaterThanAssestInd)/ nrow(CheckData) #0.1687396 
 
 
 

@@ -58,11 +58,11 @@ Logistic1 <- train(IsLeader ~ . ,
 Logistic1
 summary(Logistic1)
 
-DependVar <- data.frame(Name = names(Training.data),
-                        Value = 0)
-
-write.csv(DependVar, paste(DataPath, "/DependVar.csv", sep=""),
-          quote = F, row.names = F) 
+# DependVar <- data.frame(Name = names(Training.data),
+#                         Value = 0)
+# 
+# write.csv(DependVar, paste(DataPath, "/DependVar.csv", sep=""),
+#           quote = F, row.names = F) 
 
 # Use limited features
 set.seed(35)
@@ -87,16 +87,6 @@ summary(Logistic2)
 #### predictive modelling - boosting and random forest
 
 #####2.1: boosting
-# In particular, boosting is to find stronger and more comprehesive 
-# rulse from many weaker rules. 
-# Step1: Use a weak/simple rule as a classfier, and then evolve 
-# to multiple version by panilying incorrect results
-# step2: Combine all weak rules and generate a stronger rules. 
-# Which later can be used to generate more 
-#        stronger rules with different version
-# ..., continue, until .depth or accuracy met
-
-
 
 ada.grid <- expand.grid(.iter = c(50, 100),
                         .maxdepth = c(4, 10),
@@ -161,30 +151,6 @@ rf.tune1 <- train(IsLeader ~ .-latest_iq_total_assets,
 rf.tune1
 
 
-# Use limited feature
-set.seed(35)
-rf.grid2 <- data.frame(.mtry = c(3,4)) # sqrt(9) = 3
-
-rf.tune2 <- train(IsLeader ~ IQ_LT_INVEST
-                  +IQ_NI_AVAIL_INCL
-                  +IQ_NON_CASH_ITEMS
-                  +IQ_OTHER_FINANCE_ACT_SUPPL
-                  +IQ_OTHER_INVESTING
-                  +IQ_OTHER_OPER_ACT
-                  +IQ_PROPERTY_NET
-                  +IQ_TREASURY_OTHER_EQUITY
-                  +latest_iq_rev,
-                  data = Training.data,
-                  method = "rf",
-                  metric = "ROC",
-                  tuneGrid = rf.grid2,
-                  trControl = cv.ctrl)
-rf.tune2
-
-
- 
-
-
 ## step3 #####
 #### Model validation
 
@@ -200,26 +166,14 @@ confusionMatrix(glm.pred2, Testing.data$IsLeader)
 ada.pred1 <- predict(ada.tune1, Testing.data)
 confusionMatrix(ada.pred1, Testing.data$IsLeader)
 
-ada.pred2 <- predict(ada.tune2, Testing.data)
-confusionMatrix(ada.pred2, Testing.data$IsLeader)
-
 
 # RF
 rf.pred1 <- predict(rf.tune1, Testing.data)
 confusionMatrix(rf.pred1, Testing.data$IsLeader)
 
-rf.pred2 <- predict(rf.tune2, Testing.data)
-confusionMatrix(rf.pred2, Testing.data$IsLeader)
-
- 
 
 
-# We can also calculate, using each of the four fitted models, 
-# the predicted probabilities for the test.batch, and use those 
-# probabilities to plot the ROC curves.
-
-
-# logistic = 0.7053
+# Check ROC  
 glm.probs <- predict(Logistic1, Testing.data, type = "prob")
 glm.ROC <- roc(response = Testing.data$IsLeader,
                predictor = glm.probs$Y,
@@ -227,14 +181,14 @@ glm.ROC <- roc(response = Testing.data$IsLeader,
 plot(glm.ROC, type = "S")
 
 
-# Boost model = 0.7537
+# Boosting  
 ada.probs <- predict(ada.tune1, Testing.data, type = "prob")
 ada.ROC <- roc(response = Testing.data$IsLeader,
                predictor = ada.probs$Y,
                levels = levels(as.factor(Testing.data$IsLeader)))
 plot(ada.ROC, add=T, col = "green")
 
-# RF = 0.7545
+# RF  
 rf.probs <- predict(rf.tune1, Testing.data, type = "prob")
 rf.ROC <- roc(response = Testing.data$IsLeader,
               predictor = rf.probs$Y,
@@ -244,16 +198,13 @@ plot(rf.ROC, add = T, col = "red")
 
 
 
-## The following R script uses caret function resamples to collect the resampling results, 
-# then calls the dotplot function to create a visualization of the resampling distributions.
-# One graph which sums up the performance of the four models, this is it.
+## ROC from all the resampling results 
 cv.values <- resamples(list(Logistic = Logistic1,
                             Ada = ada.tune1,
                             RF = rf.tune1,
                             SVM = svm.tune1))
 cv.values 
-# Number of resamples = K * repeats (K = K-fold cross validation, where repeat 'repeats' times)
-
+ 
 dotplot(cv.values, metric = "ROC")
 
 bwplot(cv.values)
