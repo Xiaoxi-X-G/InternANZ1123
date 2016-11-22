@@ -1,4 +1,3 @@
-rm(list = ls())
 getMKLthreads()
 DataPath <- "C:/DataAnalysis/Data/anz_debt_issuance"
 
@@ -21,6 +20,8 @@ CompanyScore.temp <- MarketEntryData[order(MarketEntryData$IssuedCurrency,
                                            MarketEntryData$MarketEntryDate,
                                            MarketEntryData$companyId),
                                      ]
+
+
 ######Step2 ######
 #Rank the companies for each currency: A score in [0,1] is given for a company for each currency
 CompanyScore <- matrix(0, nrow = length(unique(CompanyScore.temp$companyId)),
@@ -62,6 +63,7 @@ Finial.CompanyScore <- df.CompanyScore[order(df.CompanyScore$TotalScore, decreas
 #       quote = F, row.names =  F)
 
 plot(sort(Finial.CompanyScore$TotalScore, decreasing =T))
+
 
 
 

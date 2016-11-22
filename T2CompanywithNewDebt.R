@@ -1,4 +1,3 @@
-rm(list = ls())
 getMKLthreads()
 DataPath <- "C:/DataAnalysis/Data/anz_debt_issuance"
 
@@ -8,39 +7,16 @@ DataPath <- "C:/DataAnalysis/Data/anz_debt_issuance"
 # haven't issued debt in the last 3 years), and the dates in 
 # which they issued debt. ("market_entries")
 ##########################################################
+library(RODBC)
 
 
 # Step1: Import debt balance and filter out companies using the companyIDs shared by all files
 # Step2: Find new market entry dates of each companies
-# Step3: Rank the companies for each currency: A score in [0,1] is given for a company for each currency
-
-
-# ####1. Import debt_balance, debt_issuance ####
-# DebtBalance.raw <- read.delim(file = paste(DataPath, "/debt_balance.tsv", sep = ""),
-#                               header = T,
-#                               stringsAsFactors = F,
-#                               quote = "",
-#                               na.strings = c("","NA", "NULL"))
-# 
-# DebtIssuance.raw <- read.delim(file = paste(DataPath, "/debt_issuance.rpt", sep = ""),
-#                                header = T,
-#                                stringsAsFactors = F,
-#                                quote = "",
-#                                na.strings = c("","NA", "NULL"))
-# # 
-# # write.csv(DebtIssuance.raw[, c(1)], paste(DataPath, "/DebtIssuance_Short.csv", sep = ""),
-# #           row.names = F, quote =  F)
-
-
-# CompanyIDComm<- read.csv(file = paste(DataPath, "/CompanyIDComm.csv", sep=""), 
-#                          header = T,
-#                          stringsAsFactors = F)
-
+ 
 
 
 ##### Step 1 #####
 ##### Import debt balance and filter out companies using the companyIDs shared by all files
-library(RODBC)
 odbcDataSources()
 conn<-odbcConnect(dsn="localdb") 
 
@@ -68,7 +44,7 @@ DebtBalance2.order <- DebtBalance2[order(DebtBalance2$companyId,
                                          DebtBalance2$PeriodEndDate),]
 
 
-#####Step 2####
+##### Step 2####
 #### Find new market entry dates of each companies
 
 #2.1 Remove rows where issuedCurrency = NA, around 3.3% of the rows
