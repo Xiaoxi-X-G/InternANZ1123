@@ -144,7 +144,6 @@ rf.tune1
 ## step3 #####
 #### Model validation
 
-
 # Logistics
 glm.pred1 <- predict(Logistic1, Testing.data)
 confusionMatrix(glm.pred1, Testing.data$IsLeader)
