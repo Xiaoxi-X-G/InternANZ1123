@@ -127,16 +127,6 @@ plot.train(ada.tune2)
 
 
 #####2.2: Random forest
-# The number of randomly pre-selected predictor variables 
-# for each node,  designated mtry, is the sole parameter 
-# available for tuning an RF with train.
-
-# step1: Use bootstrap to generate many training dataset.
-# step2: build predictive model for each training dataset.
-# step3: Combine results (averaging or majority vote) and 
-#produce finial predicts.
-
-
 
 # Use all feature
 set.seed(35)
